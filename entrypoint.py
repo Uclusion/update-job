@@ -8,6 +8,7 @@
 
 import sys
 import logging
+import re
 
 if __name__ == "__main__" :
     secret_key_id = sys.argv[1]
@@ -18,6 +19,23 @@ if __name__ == "__main__" :
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(levelname)s: %(message)s')
     logger.info('GitHub Event message: %s', commit_message)
     logger.info('secret key id: %s', secret_key_id)
+
+    regex = r'([A-Z]+-[A-Za-z]+-\d+)'
+    extracted = None
+
+    # extract from 'https://stage.uclusion.com/dd56682c-9920-417b-be46-7a30d41bc905/J-Marketing-9'
+    # or 'J-Marketing-9 some text'
+    match_url = re.search(regex, commit_message)
+    if match_url:
+        extracted = match_url.group(1)
+
+    # Extract from text
+    match_text = re.search(regex, commit_message)
+    if match_text:
+        extracted = match_text.group(1)
+
+    if extracted is not None:
+        logger.info('extracted %s', extracted)
 
 
     # This is how you produce workflow outputs.
