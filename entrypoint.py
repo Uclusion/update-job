@@ -8,18 +8,20 @@
 
 import sys
 import logging
+import pprint
 
 if __name__ == "__main__" :
-    githubToken = sys.argv[1]
-    githubEvent = sys.argv[2]
-    secretKeyId = sys.argv[3]
-    secretKey = sys.argv[4]
+    github_token = sys.argv[1]
+    github_event = sys.argv[2]
+    secret_key_id = sys.argv[3]
+    secret_key = sys.argv[4]
 
     logger = logging.getLogger()
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(levelname)s: %(message)s')
-    logger.info('GitHub Event: {0}'.format(githubEvent))
+    github_event_dict = pprint.pformat(github_event)
+    logger.info('GitHub Event: {0}'.format(github_event_dict))
 
-    logger.info('secret key id: %s', secretKeyId)
+    logger.info('secret key id: %s', secret_key_id)
 
 
     # This is how you produce workflow outputs.
