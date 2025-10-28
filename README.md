@@ -1,2 +1,2 @@
 # update-job
-Github action to change stage and add labels to a Uclusion job
+Github action to change stage of a Uclusion job on code commit

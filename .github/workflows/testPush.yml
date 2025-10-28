@@ -17,4 +17,4 @@ jobs:
       run: docker build . --file Dockerfile
 
     - name: Run the action
-      run: python entrypoint.py ${{ secrets.GIT_TOKEN }} ${{ github.event }} ${{ secrets.UCLUSION_SECRET_KEY_ID }} ${{ secrets.UCLUSION_SECRET_KEY }}
+      run: python entrypoint.py ${{ secrets.UCLUSION_SECRET_KEY_ID }} ${{ secrets.UCLUSION_SECRET_KEY }} ${{ github.event.message }}

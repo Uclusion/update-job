@@ -1,25 +1,21 @@
 name: 'Update Uclusion'
-description: 'Update Uclusion jobs from push or release'
+description: 'Update Uclusion job from push'
 
 inputs:
-  github-token:
-    description: 'Token for the repo this action is used in'
-    required: true
-  github-event:
-    description: 'The push or release event'
-    required: true
   secret_key_id:
     description: 'Uclusion secret key id'
     required: true
   secret_key:
     description: 'Uclusion secret key'
     required: true
+  github-event-message:
+    description: 'The push message with Uclusion job code'
+    required: true
 
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.github-token }}
-    - ${{ inputs.github-event }}
     - ${{ inputs.secret_key_id }}
     - ${{ inputs.secret_key }}
+    - ${{ inputs.github-event-message }}

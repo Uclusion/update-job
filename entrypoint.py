@@ -8,19 +8,15 @@
 
 import sys
 import logging
-import pprint
 
 if __name__ == "__main__" :
-    github_token = sys.argv[1]
-    github_event = sys.argv[2]
-    secret_key_id = sys.argv[3]
-    secret_key = sys.argv[4]
+    secret_key_id = sys.argv[1]
+    secret_key = sys.argv[2]
+    commit_message = sys.argv[3]
 
     logger = logging.getLogger()
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(levelname)s: %(message)s')
-    github_event_dict = pprint.pformat(github_event)
-    logger.info('GitHub Event: {0}'.format(github_event_dict))
-
+    logger.info('GitHub Event message: %s', commit_message)
     logger.info('secret key id: %s', secret_key_id)
 
 
