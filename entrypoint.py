@@ -16,7 +16,7 @@ if __name__ == "__main__" :
     secretKey = sys.argv[4]
 
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(levelname)s: %(message)s')
     logger.info('GitHub Event:')
     logger.info(githubEvent)
 
