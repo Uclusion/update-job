@@ -17,10 +17,9 @@ if __name__ == "__main__" :
 
     logger = logging.getLogger()
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(levelname)s: %(message)s')
-    logger.info('GitHub Event:')
-    logger.info(githubEvent)
+    logger.info('GitHub Event: {0}'.format(githubEvent))
 
-    logger.info('secret key id:', secretKeyId)
+    logger.info('secret key id: %s', secretKeyId)
 
 
     # This is how you produce workflow outputs.
