@@ -1,0 +1,22 @@
+name: test this action for a push
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Verify that the Docker image for the action builds
+      run: docker build . --file Dockerfile
+
+    - name: Run the action
+      run: python entrypoint.py ${{ secrets.GIT_TOKEN }} ${{ github.event }} ${{ secrets.UCLUSION_SECRET_KEY_ID }} ${{ secrets.UCLUSION_SECRET_KEY }}
