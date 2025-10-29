@@ -17,14 +17,12 @@ if __name__ == "__main__" :
 
     logger = logging.getLogger()
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(levelname)s: %(message)s')
-    logger.info('GitHub Event message: %s', commit_message)
-    logger.info('secret key id: %s', secret_key_id)
 
     regex = r'([A-Z]+-[A-Za-z]+-\d+)'
     extracted = None
 
-    # extract from 'https://stage.uclusion.com/dd56682c-9920-417b-be46-7a30d41bc905/J-Marketing-9'
-    # or 'J-Marketing-9 some text'
+    # extract from 'something https://stage.uclusion.com/dd56682c-9920-417b-be46-7a30d41bc905/J-Marketing-9 else'
+    # or 'some J-Marketing-9 other'
     match_url = re.search(regex, commit_message)
     if match_url:
         extracted = match_url.group(1)
