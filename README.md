@@ -1,2 +1,24 @@
 # update-job
-Github action to change stage of a Uclusion job on code commit
+Github action to change stage of a Uclusion job on code commit. Example:
+
+```
+name: Mark job complete on commit
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  markJobComplete:
+    runs-on: ubuntu-latest
+    environment:
+      name: "development"
+    steps:
+      - name: Mark job complete
+        uses: Uclusion/update-job@v1
+        with:
+          secret_key_id: ${{ secrets.SECRET_KEY_ID }}
+          secret_key: ${{ secrets.SECRET_KEY }}
+          workspace_id: ${{ secrets.WORKSPACE_ID }}
+          github-event-message: ${{ github.event.head_commit.message }}
+```
