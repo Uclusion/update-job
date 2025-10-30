@@ -1,4 +1,4 @@
-#!/usr/bin/env -S python
+#!/usr/bin/env -S python3 -B
 
 # NOTE: If you are using an alpine docker image
 # such as pyaction-lite, the -S option above won't
