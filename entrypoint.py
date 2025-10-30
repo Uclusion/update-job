@@ -18,7 +18,7 @@ DEV_API_URL = "dev.api.uclusion.com/v1"
 STAGE_API_URL = "stage.api.uclusion.com/v1"
 PRODUCTION_API_URL = "production.api.uclusion.com/v1"
 DEV_SECRET_KEY_ID = "942a8a2a-2b72-4def-b4ae-68c020cce326_1a0e71d8-16f9-4984-8cc3-3bbeca8df29a"
-STAGE_SECRET_KEY_ID = ""
+STAGE_SECRET_KEY_ID = "24a08ec1-70c0-47d7-9a4f-b7cc3acb3776_8755dc22-ab53-422c-8188-7198d2104d30"
 
 
 def send(data, method, my_api_url, auth=None):
