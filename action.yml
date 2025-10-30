@@ -8,6 +8,9 @@ inputs:
   secret_key:
     description: 'Uclusion secret key'
     required: true
+  workspace_id:
+    description: 'Uclusion workspace id'
+    required: true
   github-event-message:
     description: 'The push message with Uclusion job code'
     required: true
@@ -18,4 +21,5 @@ runs:
   args:
     - ${{ inputs.secret_key_id }}
     - ${{ inputs.secret_key }}
+    - ${{ inputs.workspace_id }}
     - ${{ inputs.github-event-message }}
