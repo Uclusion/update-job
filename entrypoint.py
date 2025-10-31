@@ -107,15 +107,6 @@ if __name__ == "__main__" :
         if response is None or 'uclusion_token' not in response:
             raise Exception(response)
         api_token = response['uclusion_token']
-        user_id = response['user_id']
         stages = response['stages']
         completed_stage = get_completed_stage(stages)
         market_job_complete(extracted, completed_stage, api_token, api_url)
-
-
-    # This is how you produce workflow outputs.
-    # Make sure corresponds to output variable names in action.yml
-    # if "GITHUB_OUTPUT" in os.environ :
-    #     with open(os.environ["GITHUB_OUTPUT"], "a") as f :
-    #         print("{0}={1}".format("output-one", output1), file=f)
-    #         print("{0}={1}".format("output-two", output2), file=f)
