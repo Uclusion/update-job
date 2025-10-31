@@ -16,17 +16,12 @@ STAGE_SECRET_KEY_ID = "24a08ec1-70c0-47d7-9a4f-b7cc3acb3776_8755dc22-ab53-422c-8
 
 
 def send(data, method, my_api_url, auth=None):
-    # Encode the data into JSON format
     json_data = json.dumps(data)
     json_data_as_bytes = json_data.encode('utf-8')  # Convert to bytes
 
     headers = {'Content-Type': 'application/json'}
     if auth is not None:
         headers['Authorization'] = auth
-
-    # Create a Request object
-    # The 'data' parameter in Request() is used for POST requests
-    # We also need to set the 'Content-Type' header to 'application/json'
     req = urllib.request.Request(
         my_api_url,
         data=json_data_as_bytes,
@@ -34,7 +29,6 @@ def send(data, method, my_api_url, auth=None):
         method=method
     )
 
-    # Send the request and get the response
     with urllib.request.urlopen(req) as response:
         # Check the HTTP status code
         if response.status == 200 or response.status == 201:
