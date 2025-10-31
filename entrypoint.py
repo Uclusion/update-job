@@ -58,7 +58,7 @@ def get_completed_stage(stages):
     raise Exception('No stage found')
 
 
-def market_job_complete(short_code, completed_stage, capability, domain):
+def mark_job_complete(short_code, completed_stage, capability, domain):
     complete_job_api_url = 'https://investibles.' + domain + '/cli/' + short_code
     data = {
         'stage_id': completed_stage['id']
@@ -97,4 +97,4 @@ if __name__ == "__main__" :
         api_token = response['uclusion_token']
         stages = response['stages']
         completed_stage = get_completed_stage(stages)
-        market_job_complete(extracted, completed_stage, api_token, api_url)
+        mark_job_complete(extracted, completed_stage, api_token, api_url)
