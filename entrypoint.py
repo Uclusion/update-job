@@ -6,7 +6,7 @@ import re
 import urllib.request
 import urllib.parse
 import json
-from urllib.parse import urlencode
+from urllib.parse import quote
 
 DEV_API_URL = "dev.api.uclusion.com/v1"
 STAGE_API_URL = "stage.api.uclusion.com/v1"
@@ -59,7 +59,7 @@ def get_completed_stage(stages):
 
 
 def mark_job_complete(short_code, completed_stage, capability, domain):
-    complete_job_api_url = 'https://investibles.' + domain + '/cli/' + urlencode(short_code)
+    complete_job_api_url = 'https://investibles.' + domain + '/cli/' + quote(short_code)
     data = {
         'stage_id': completed_stage['id']
     }
