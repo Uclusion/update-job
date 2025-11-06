@@ -75,7 +75,7 @@ if __name__ == "__main__" :
     logger = logging.getLogger()
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(levelname)s: %(message)s')
 
-    regex = r'([A-Z]+-[A-Za-z]+-\d+)'
+    regex = r'([A-Z]+-[A-Za-z\s]+-\d+)'
     extracted = None
 
     # extract from 'something https://stage.uclusion.com/dd56682c-9920-417b-be46-7a30d41bc905/J-Marketing-9 else'
