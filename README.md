@@ -1,6 +1,7 @@
 # update-job
-Github action to change stage of a Uclusion job on code commit. Example:
+Github action to change stage of a Uclusion job on code commit. See doc [here](https://documentation.uclusion.com/actions).
 
+Example:
 ```
 name: Mark job complete on commit
 
