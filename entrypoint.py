@@ -16,18 +16,22 @@ STAGE_SECRET_KEY_ID = "24a08ec1-70c0-47d7-9a4f-b7cc3acb3776_8755dc22-ab53-422c-8
 
 
 def send(data, method, my_api_url, auth=None):
-    json_data = json.dumps(data)
-    json_data_as_bytes = json_data.encode('utf-8')  # Convert to bytes
-
     headers = {'Content-Type': 'application/json'}
     if auth is not None:
         headers['Authorization'] = auth
-    req = urllib.request.Request(
-        my_api_url,
-        data=json_data_as_bytes,
-        headers=headers,
-        method=method
-    )
+    if data is not None:
+        req = urllib.request.Request(
+            my_api_url,
+            data=json.dumps(data).encode('utf-8'),  # Convert to bytes
+            headers=headers,
+            method=method
+        )
+    else:
+        req = urllib.request.Request(
+            my_api_url,
+            headers=headers,
+            method=method
+        )
 
     with urllib.request.urlopen(req) as response:
         # Check the HTTP status code
@@ -66,23 +70,48 @@ def mark_job_complete(short_code, completed_stage, capability, domain):
     return send(data, 'PATCH', complete_job_api_url, capability)
 
 
+def label_jobs(short_codes, capability, domain, label_to_apply):
+    label_api_url = 'https://investibles.' + domain + '/add_labels'
+    data = {'ticket_codes': short_codes, 'label': label_to_apply}
+    return send(data, 'PATCH', label_api_url, capability)
+
+
+def get_job_report(short_code, capability, domain):
+    report_api_url = 'https://investibles.' + domain + '/cli_report/' + quote(short_code)
+    return send(None, 'GET', report_api_url, capability)
+
+
+def get_enclosing_job_code(report):
+    if not report:
+        return None
+    match = re.search(r'##\s*Job\s+(J-[A-Za-z\s]+-\d+)', report)
+    return match.group(1).strip() if match else None
+
+
+def add_note(short_code, body, capability, domain):
+    note_api_url = 'https://investibles.' + domain + '/cli/' + quote(short_code)
+    return send({'body': body, 'tz': 'UTC'}, 'POST', note_api_url, capability)
+
+
 if __name__ == "__main__" :
     secret_key_id = sys.argv[1]
     secret_key = sys.argv[2]
     workspace_id = sys.argv[3]
     commit_message = sys.argv[4]
+    pending_label = sys.argv[5] if len(sys.argv) > 5 else 'Awaiting deploy'
 
     logger = logging.getLogger()
     logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(levelname)s: %(message)s')
 
-    regex = r'(J-[A-Za-z\s]+-\d+)'
+    # Match any short code (J-/T-/B-/C-...), not just jobs, so task commits are handled too.
+    regex = r'([A-Z]+-[A-Za-z\s]+-\d+)'
     extracted = None
 
-    # extract from 'something https://stage.uclusion.com/dd56682c-9920-417b-be46-7a30d41bc905/J-Marketing-9 else'
-    # or 'some J-Marketing-9 other'
+    # extract from 'something https://stage.uclusion.com/dd56682c-9920-417b-be46-7a30d41bc905/T-Marketing-9 else'
+    # or 'some T-Marketing-9 other'
     match = re.search(regex, commit_message)
     if match:
-        extracted = match.group(1)
+        extracted = match.group(1).strip()
 
     if extracted is not None:
         logger.info('extracted %s', extracted)
@@ -96,5 +125,25 @@ if __name__ == "__main__" :
             raise Exception(response)
         api_token = response['uclusion_token']
         stages = response['stages']
-        completed_stage = get_completed_stage(stages)
-        mark_job_complete(extracted, completed_stage, api_token, api_url)
+        job_code = None
+        if extracted.startswith('J-'):
+            # By convention a J- code is only committed when the job has no tasks left, so it is done -
+            # move it to the completed stage as before.
+            completed_stage = get_completed_stage(stages)
+            mark_job_complete(extracted, completed_stage, api_token, api_url)
+            job_code = extracted
+        else:
+            # A task/bug commit - resolve its enclosing job.
+            try:
+                job_code = get_enclosing_job_code(get_job_report(extracted, api_token, api_url))
+            except Exception as e:
+                logger.info('could not resolve job for %s: %s', extracted, e)
+        if job_code is not None:
+            # A new commit means the job has work not yet on any environment. Append a dated
+            # 'Awaiting deploy' label (newest label wins in the UI, superseding a stale 'Deployed to ...')
+            # plus a note, so the job stops falsely showing as deployed (J-all-329).
+            try:
+                label_jobs([job_code], api_token, api_url, pending_label)
+                add_note(job_code, extracted + ' committed - awaiting deploy.', api_token, api_url)
+            except Exception as e:
+                logger.info('could not mark %s awaiting deploy: %s', job_code, e)

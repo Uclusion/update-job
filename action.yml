@@ -16,6 +16,10 @@ inputs:
   github-event-message:
     description: 'The push message with Uclusion job code'
     required: true
+  label:
+    description: 'Label applied to the job when it has a commit not yet deployed'
+    required: false
+    default: 'Awaiting deploy'
 
 runs:
   using: 'docker'
@@ -25,3 +29,4 @@ runs:
     - ${{ inputs.secret_key }}
     - ${{ inputs.workspace_id }}
     - ${{ inputs.github-event-message }}
+    - ${{ inputs.label }}
