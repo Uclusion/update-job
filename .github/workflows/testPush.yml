@@ -16,5 +16,7 @@ jobs:
     - name: Verify that the Docker image for the action builds
       run: docker build . --file Dockerfile
 
+    # Smoke test only (never was an integration test): pass a message with no Uclusion code so the
+    # action parses/runs and cleanly no-ops without needing a live workspace (T-all-2240).
     - name: Run the action
-      run: python entrypoint.py ${{ secrets.UCLUSION_SECRET_KEY_ID }} ${{ secrets.UCLUSION_SECRET_KEY }} ${{ secrets.UCLUSION_WORKSPACE_ID }} "${{ github.event.head_commit.message }}"
+      run: python entrypoint.py ${{ secrets.UCLUSION_SECRET_KEY_ID }} ${{ secrets.UCLUSION_SECRET_KEY }} ${{ secrets.UCLUSION_WORKSPACE_ID }} "ci smoke test"
