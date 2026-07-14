@@ -81,9 +81,14 @@ def get_job_report(short_code, capability, domain):
     return send(None, 'GET', report_api_url, capability)
 
 
-def job_has_open_tasks(report):
-    # Open tasks render as '#### Task T-...'; resolved tasks render as '#### Resolved Task ...' (no match).
-    return report is not None and '\n#### Task ' in report
+# Open items render as '#### <Type> <code>'; resolved ones render '#### Resolved <Type> ...' (no match).
+# Open suggestions, questions, and blockers count like tasks: marking the job complete resolves them,
+# so a J- push must not sneak past open assistance (B-all-478 / Q-all-219).
+OPEN_WORK_HEADINGS = ('\n#### Task ', '\n#### Suggestion ', '\n#### Question ', '\n#### Issue ')
+
+
+def job_has_open_work(report):
+    return report is not None and any(heading in report for heading in OPEN_WORK_HEADINGS)
 
 
 def get_enclosing_job_code(report):
@@ -133,17 +138,17 @@ if __name__ == "__main__" :
         job_code = None
         if extracted.startswith('J-'):
             # By convention a J- code is only committed when the job has no tasks left, so it is done -
-            # move it to the completed stage. Guard against completion resolving open tasks: only mark
-            # complete when the report confirms none are open; if the report cannot be fetched, skip
-            # marking complete (T-all-2243).
+            # move it to the completed stage. Guard against completion resolving open work: only mark
+            # complete when the report confirms no open tasks, suggestions, questions, or blockers;
+            # if the report cannot be fetched, skip marking complete (T-all-2243).
             try:
-                if job_has_open_tasks(get_job_report(extracted, api_token, api_url)):
-                    logger.info('%s has open tasks - not marking complete', extracted)
+                if job_has_open_work(get_job_report(extracted, api_token, api_url)):
+                    logger.info('%s has open work - not marking complete', extracted)
                 else:
                     completed_stage = get_completed_stage(stages)
                     mark_job_complete(extracted, completed_stage, api_token, api_url)
             except Exception as e:
-                logger.info('could not verify open tasks for %s - not marking complete: %s', extracted, e)
+                logger.info('could not verify open work for %s - not marking complete: %s', extracted, e)
             job_code = extracted
         else:
             # A task/bug commit - resolve its enclosing job.
