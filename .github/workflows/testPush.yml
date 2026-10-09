@@ -13,10 +13,14 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Verify that the Docker image for the action builds
-      run: docker build . --file Dockerfile
-
     # Smoke test only (never was an integration test): pass a message with no Uclusion code so the
     # action parses/runs and cleanly no-ops without needing a live workspace (T-all-2240).
+    # Runs action.yml itself so the composite wiring is covered; the shell metacharacters check that a
+    # commit message reaches entrypoint.py as data.
     - name: Run the action
-      run: python entrypoint.py ${{ secrets.UCLUSION_SECRET_KEY_ID }} ${{ secrets.UCLUSION_SECRET_KEY }} ${{ secrets.UCLUSION_WORKSPACE_ID }} "ci smoke test"
+      uses: ./
+      with:
+        secret_key_id: ${{ secrets.UCLUSION_SECRET_KEY_ID }}
+        secret_key: ${{ secrets.UCLUSION_SECRET_KEY }}
+        workspace_id: ${{ secrets.UCLUSION_WORKSPACE_ID }}
+        github-event-message: 'ci smoke test "quoted" $(exit 1) `exit 1`'

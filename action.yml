@@ -21,12 +21,19 @@ inputs:
     required: false
     default: 'Awaiting deploy'
 
+# Composite on the runner's own python3 (entrypoint.py is stdlib only) so a run never depends on pulling an
+# image from Docker Hub. Inputs go through env, never inlined into the script, so a commit message cannot
+# inject shell.
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - ${{ inputs.secret_key_id }}
-    - ${{ inputs.secret_key }}
-    - ${{ inputs.workspace_id }}
-    - ${{ inputs.github-event-message }}
-    - ${{ inputs.label }}
+  using: 'composite'
+  steps:
+    - shell: bash
+      env:
+        UCLUSION_SECRET_KEY_ID: ${{ inputs.secret_key_id }}
+        UCLUSION_SECRET_KEY: ${{ inputs.secret_key }}
+        UCLUSION_WORKSPACE_ID: ${{ inputs.workspace_id }}
+        UCLUSION_EVENT_MESSAGE: ${{ inputs.github-event-message }}
+        UCLUSION_LABEL: ${{ inputs.label }}
+      run: >-
+        python3 -B "$GITHUB_ACTION_PATH/entrypoint.py" "$UCLUSION_SECRET_KEY_ID" "$UCLUSION_SECRET_KEY"
+        "$UCLUSION_WORKSPACE_ID" "$UCLUSION_EVENT_MESSAGE" "$UCLUSION_LABEL"
